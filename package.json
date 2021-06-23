@@ -1,0 +1,19 @@
+{
+  "name": "event",
+  "version": "1.0.0",
+  "description": "save event to mysql",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "event"
+  ],
+  "author": "xjl",
+  "license": "ISC",
+  "dependencies": {
+    "mysql": "2.16.0",
+    "node-schedule": "2.0.0",
+    "sequelize": "3.24.1"
+  }
+}
