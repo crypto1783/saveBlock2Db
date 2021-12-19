@@ -98,6 +98,28 @@ function createEventParams (eventId, params)
     });
 }
 
+let handler = {
+    TokenMinted(event) {
+        var key  = ['account', 'sourceId', 'metadata', 'info']
+        return encapsulates(event, key);
+    },
+
+    TokenTransferred: function (event) {
+        var key  = ['account', 'toAccount', 'sourceId']
+        return encapsulates(event, key);
+    },
+
+}
+
+function encapsulates(event, key){
+    var obj = {};
+    var list = event.data.toHuman();
+    list.map((item,idx) => {
+        obj[key[idx]] = item;
+    })
+    return obj;
+}
+
 async function saveEvents(hash, blockNum,api) {
     const eventsInOneBlock = await api.query.system.events.at(hash);
     const events = eventsInOneBlock
@@ -116,87 +138,111 @@ async function saveEvents(hash, blockNum,api) {
         }));
     events.forEach(
         function (event) {
-            var paramArr = new Array();
-            let dataArray = event.data.map((value) => ({ value }));
-            dataArray.forEach(
-                function (element, index) {
-                    const paramtype = event.typeDef[index].type;
-                    const paramValue = element.value.toHuman();
-                    //console.log("Param Type = ", paramtype, ". Param Value = ", paramValue);
-                    //console.log("asApplyExtrinsic=", event.index);
-                    paramData = {
-                        id: null,
-                        index: index,
-                        event_id: null,
-                        type: paramtype,
-                        value: paramValue
-                    };
-                    paramArr.push(paramData);
-                }
-            );
+            console.log("event---",event);
+            console.log("data---",event.data.toHuman());
+            // let dataArray = event.data.map((value) => ({ value }));
+            // var list = event.data.toHuman();
+            // list.map((item,index) => {
+               
+            // })
+            // console.log("参数结果",dataArray);
+            // dataArray.forEach(
+            //     function (element, index) {
+            //         console.log("参数结果",element);
+            //         const paramtype = event.typeDef[index].type;
+            //         const paramValue = element.value.toHuman();
+            //         //console.log("Param Type = ", paramtype, ". Param Value = ", paramValue);
+            //         //console.log("asApplyExtrinsic=", event.index);
+            //         paramData = {
+            //             id: null,
+            //             index: index,
+            //             event_id: null,
+            //             type: paramtype,
+            //             value: paramValue
+            //         };
+            //         paramArr.push(paramData);
+            //         console.log("paramArr====>",paramArr);
+            //     }
+             
+            // );
 
-            if (event.section == 'kittiesModule')
+            if (event.section == 'gwiTicket')
             {
-                if (event.method == 'Created')
-                {
-                    const ticketEvent = {
+                console.log("请求方法", event.method);
+                var obj = handler[event.method] && handler[event.method](event);
+                if(obj){
+                    var sourceId = obj.sourceId || ['-0', '0'];
+                    const eventData = {
                         id: null,
-                        ticket_index: dataArray[1].value.toHuman(),
-                        ticket_hash: null,
-                        method: event.method,
                         section: event.section,
-                        extrinsic_hash: null,
+                        method: event.method,
+                        extrinsic: '',
+                        index: '',
                         block_hash: hash,
-                        block_num: blockNum,
-                        info: 'create by: account: ' + dataArray[0].value.toHuman() +'. ticket index: ' + dataArray[1].value.toHuman()
+                        block_num: parseInt(blockNum),
+                        class_id: parseInt(sourceId[0]),
+                        token_id: parseInt(sourceId[1]),
+                        info: JSON.stringify(obj),
                     };
-                    createTicketEvent(ticketEvent)
+                    console.log("obj请求",eventData)
+                    createTicketEvent(eventData)
                 }
+                // console.log("Dara====",event.data)
+                // console.log("created===>",dataArray[1].value.toHuman());
+                // console.log("info===>",dataArray[0].value.toHuman());
+                // if (event.method == 'Created')
+                // {
+                //     const ticketEvent = {
+                //         id: null,
+                //         ticket_index: dataArray[1].value.toHuman(),
+                //         ticket_hash: null,
+                //         method: event.method,
+                //         section: event.section,
+                //         extrinsic_hash: null,
+                //         block_hash: hash,
+                //         block_num: blockNum,
+                //         info: 'create by: account: ' + dataArray[0].value.toHuman() +'. ticket index: ' + dataArray[1].value.toHuman()
+                //     };
+                //     console.log("created===>",dataArray[1].value.toHuman());
+                //     console.log("info===>",dataArray[0].value.toHuman());
+                //     // createTicketEvent(ticketEvent)
+                // }
                 //Transferred(AccountId, AccountId,KittyIndex),
-                if (event.method == 'Transferred')
-                {
-                    const ticketEvent = {
-                        id: null,
-                        ticket_index: dataArray[2].value.toHuman(),
-                        ticket_hash: null,
-                        method: event.method,
-                        section: event.section,
-                        extrinsic_hash: null,
-                        block_hash: hash,
-                        block_num: blockNum,
-                        info: 'transfer .from account: '+dataArray[0].value.toHuman() +' to account: ' + dataArray[1].value.toHuman()
-                    };
-                    createTicketEvent(ticketEvent)
-                }
-                //SplitToTwo(AccountId, KittyIndex, KittyIndex, KittyIndex),
-                if (event.method == 'SplitToTwo')
-                {
-                    const ticketEvent = {
-                        id: null,
-                        ticket_index: dataArray[1].value.toHuman(),
-                        ticket_hash: null,
-                        method: event.method,
-                        section: event.section,
-                        extrinsic_hash: null,
-                        block_hash: hash,
-                        block_num: blockNum,
-                        info: 'split to two ticket. ticket NO.1: '+dataArray[2].value.toHuman() +'. ticket NO.2: ' + dataArray[3].value.toHuman()
-                    };
-                    createTicketEvent(ticketEvent)
-                }
+                // if (event.method == 'Transferred')
+                // {
+                //     const ticketEvent = {
+                //         id: null,
+                //         ticket_index: dataArray[2].value.toHuman(),
+                //         ticket_hash: null,
+                //         method: event.method,
+                //         section: event.section,
+                //         extrinsic_hash: null,
+                //         block_hash: hash,
+                //         block_num: blockNum,
+                //         info: 'transfer .from account: '+dataArray[0].value.toHuman() +' to account: ' + dataArray[1].value.toHuman()
+                //     };
+                //     console.log("Transferred===>",dataArray[2].value.toHuman());
+                //     // createTicketEvent(ticketEvent)
+                // }
+                // //SplitToTwo(AccountId, KittyIndex, KittyIndex, KittyIndex),
+                // if (event.method == 'SplitToTwo')
+                // {
+                //     const ticketEvent = {
+                //         id: null,
+                //         ticket_index: dataArray[1].value.toHuman(),
+                //         ticket_hash: null,
+                //         method: event.method,
+                //         section: event.section,
+                //         extrinsic_hash: null,
+                //         block_hash: hash,
+                //         block_num: blockNum,
+                //         info: 'split to two ticket. ticket NO.1: '+dataArray[2].value.toHuman() +'. ticket NO.2: ' + dataArray[3].value.toHuman()
+                //     };
+                //     console.log("SplitToTwo===>",dataArray[1].value.toHuman());
+                //     // createTicketEvent(ticketEvent)
+                // }
             }
-
-            const eventData = {
-                id: null,
-                section: event.section,
-                method: event.method,
-                extrinsic: '',
-                index: '',
-                block_hash: hash,
-                block_num: blockNum
-            };
-            //console.log("eventData = ", eventData);
-            createEvent(eventData, paramArr);
+            //createEvent(eventData, paramArr);
         }
     );
 }

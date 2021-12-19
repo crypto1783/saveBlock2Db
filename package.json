@@ -12,6 +12,7 @@
   "author": "xjl",
   "license": "ISC",
   "dependencies": {
+    "@polkadot/api": "^6.10.1",
     "mysql": "2.16.0",
     "node-schedule": "2.0.0",
     "sequelize": "3.24.1"

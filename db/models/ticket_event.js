@@ -1,7 +1,7 @@
 const sq  = require('../sequelize');
 const Sequelize = require('sequelize');
 var TicketEvent = sq.define(
-    'ticket_event',
+    'events',
     {
         id: {
             type: Sequelize.BIGINT(32),
@@ -14,14 +14,16 @@ var TicketEvent = sq.define(
         ticket_hash: Sequelize.STRING(64),
         extrinsic_hash: Sequelize.STRING(128),
         block_hash: Sequelize.STRING(128),
-        block_num: Sequelize.STRING(128),
-        info:  Sequelize.STRING(512)  
+        block_num: Sequelize.INTEGER(11),
+        class_id: Sequelize.INTEGER(11),
+        token_id: Sequelize.INTEGER(11),
+        info:  Sequelize.JSON(512)  
     }, 
     {
         timestamps: false
     },
     {
-        tableName: 'ticket_event'
+        tableName: 'events'
     }
 );
 

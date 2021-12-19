@@ -1,3 +1,13 @@
+-- CREATE TABLE `events` (
+--   `id` int(11) NOT NULL AUTO_INCREMENT,
+--   `section` varchar(32) NOT NULL,
+--   `method` varchar(32) NOT NULL,
+--   `extrinsic` varchar(255) DEFAULT NULL,
+--   `index` varchar(32) DEFAULT NULL,
+--   `block_hash` varchar(128) DEFAULT NULL,
+--   `block_num` int(64) DEFAULT NULL,
+--   PRIMARY KEY (`id`)
+-- ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 CREATE TABLE `events` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `section` varchar(32) NOT NULL,
@@ -5,9 +15,12 @@ CREATE TABLE `events` (
   `extrinsic` varchar(255) DEFAULT NULL,
   `index` varchar(32) DEFAULT NULL,
   `block_hash` varchar(128) DEFAULT NULL,
-  `block_num` int(64) DEFAULT NULL,
+	`class_id` int(11) NOT NULL,
+	`token_id` int(11) NOT NULL,
+	`info` text DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `event_params` (

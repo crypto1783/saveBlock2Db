@@ -1,5 +1,5 @@
 var config = {
-    database: 'sub', 
+    database: 'substrate', 
     username: 'root',
     password: 'root', 
     host: '127.0.0.1', 
